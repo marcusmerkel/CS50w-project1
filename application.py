@@ -1,11 +1,13 @@
 import os
+import requests
 
-from flask import Flask, session
+from flask import Flask, session, render_template
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 app = Flask(__name__)
+KEY = "tiLqLcHydCeDdGYnDQN3ig"
 
 # Check for environment variable
 if not os.getenv("DATABASE_URL"):
@@ -22,5 +24,23 @@ db = scoped_session(sessionmaker(bind=engine))
 
 
 @app.route("/")
+@app.route("/index")
 def index():
-    return "Project 1: TODO"
+    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": KEY, "isbns": "9781632168146"}).json()
+    user = {"username": "Marcus"}
+    return "Project 1: TODO <br>" + str(res)
+
+
+@app.route("/login")
+def login():
+    return "Login"
+
+
+@app.route("/register")
+def register():
+    return "Register"
+
+
+@app.route("/logout")
+def logout():
+    return "Register"
