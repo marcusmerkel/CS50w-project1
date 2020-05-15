@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Error {{ code }}
+{% endblock %}
+
+{% block body %}
+    <img alt="{{ code }}" src="http://memegen.link/ive/{{ code }}/{{ text }}.jpg" title="{{ code }}">
+{% endblock %}

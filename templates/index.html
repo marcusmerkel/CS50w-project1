@@ -1,2 +1,21 @@
 {% extends "layout.html" %}
 
+{% block title %}
+    Home
+{% endblock %}
+
+
+{% block body %}
+    <h1>Books</h1>
+    <h3>Hi, {{ user.username }}!</h3>
+
+    <p>{{ content }}</p>
+
+    <ul>
+        <li>{{ res.books[0].id }}</li>
+        <li>{{ res.books[0].isbn }}</li>
+        <li>{{ res.books[0] }}</li>
+
+    </ul>
+
+{% endblock %}
