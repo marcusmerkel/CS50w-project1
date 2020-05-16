@@ -61,12 +61,10 @@ def index():
         q = request.form.get("q")
         return search(q)
     else:
-        res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": KEY, "isbns": "9781632168146"}).json()
-        # user = {"username": "Marcus"}
         user = db.execute("SELECT * FROM users WHERE id=:id", {"id": session.get("user_id")}).fetchone()["username"]
         id = session.get("user_id")
         content = "Project 1: TODO"
-        return render_template("index.html", user=user, content=content, res=res) 
+        return render_template("index.html", user=user, content=content) 
 
 
 @app.route("/search/<string:q>")
@@ -79,20 +77,34 @@ def search(q):
         return render_template("search.html", q=q, res=res)
 
 
+@app.route("/book/<string:isbn>")
 @app.route("/book/<string:isbn>/<string:q>")
 @login_required
-def sbook(isbn, q):
+def book(isbn, q=None):
     details = db.execute("SELECT title, author, year FROM books WHERE LOWER(isbn) = :isbn", {"isbn": isbn.lower()}).fetchone()
-    return render_template("book.html", isbn=isbn, details=details, q=q)
+    
+    if details == None:
+        return error(f"No book for ISBN {isbn}", 400)
+    reviews = db.execute("SELECT reviews.stars, reviews.text, users.username FROM reviews INNER JOIN users ON reviews.user_id=users.id WHERE LOWER(reviews.isbn) = :isbn", {"isbn": isbn.lower()}).fetchall()
+    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": KEY, "isbns": isbn}).json()
+    grRev = res["books"][0]
 
-@app.route("/book/<string:isbn>")
-@login_required
-def book(isbn):
-    details = db.execute("SELECT title, author, year FROM books WHERE LOWER(isbn) = :isbn", {"isbn": isbn.lower()}).fetchone()
-    if len(details) == 0:
-        return error(f"No results for {q}", 400)
+    if db.execute("SELECT isbn, user_id FROM reviews WHERE LOWER(isbn)=:isbn AND user_id=:user_id", {"isbn": isbn.lower(), "user_id": session.get("user_id")}).rowcount != 0:
+        hasreviewed = True
     else:
-        return render_template("book.html", isbn=isbn, details=details)
+        hasreviewed = False
+    return render_template("book.html", isbn=isbn, details=details, reviews=reviews, hasreviewed=hasreviewed, q=q, grRev = grRev)
+
+
+@app.route("/submitreview", methods=["POST"])
+def submitReview():
+    isbn = request.form.get("isbn")
+    user_id = session.get("user_id")
+    stars = request.form.get("stars")
+    text = request.form.get("reviewText")
+    db.execute("INSERT INTO reviews (isbn, user_id, stars, text) VALUES (:isbn, :user_id, :stars, :text)", {"isbn": isbn, "user_id": user_id, "stars": stars, "text": text})
+    db.commit()
+    return redirect("/book/" + isbn)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -103,31 +115,23 @@ def login():
     # POST request (form submit)
     if request.method == "POST":
 
-        # check if username
         if not request.form.get("username"):
             return error("must provide username", 403)
-
-        # Ensure password was submitted
         elif not request.form.get("password"):
             return error("must provide password", 403)
 
-        # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = :username",
                           {"username": request.form.get("username")}).fetchall()
 
-        # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["password_hash"], request.form.get("password")):
             return error("invalid username and/or password", 403)
 
-        # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
-
         flash("Successfully logged in!")
 
-        # Redirect user to home page
         return redirect("/")
 
-    # User reached route via GET (as by clicking a link or via redirect)
+    # GET request
     else:
         return render_template("login.html")
 
@@ -135,25 +139,20 @@ def login():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     
-    # Forget any user_id
     session.clear()
 
     # POST method
     if request.method == "POST":
 
-        # check if username
         if not request.form.get("username"):
             return error("must provide username", 403)
 
-        # check if password
         elif not request.form.get("password"):
             return error("must provide password", 403)
 
-        # check if 2nd password
         elif not request.form.get("password-2"):
             return error("must confirm password", 403)
 
-        # assign variables
         username = request.form.get("username")
         pw = request.form.get("password")
         pw2 = request.form.get("password-2")

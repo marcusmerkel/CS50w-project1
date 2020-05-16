@@ -11,33 +11,81 @@
     <br>
     {% if q %}
     <a href="/search/{{ q }}">Back to search results</a>
-    <br><br>
+    <br>
+    <hr>
     {% endif %}
-    <h3 class="mb-4"><strong>Book details</strong></h3>
 
-    <table class="table bookDet-table mx-auto">
-        <thead>
-            <tr>
-                <th>ISBN</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Year</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>{{ isbn }}</td>
-                <td>{{ details["title"] }}</td>
-                <td>{{ details["author"] }}</td>
-                <td>{{ details["year"] }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="container bookDet-table">
+        <h2 class="mb-4"><strong>Book details</strong> for <em>{{ details["title"] }}</em></h2>
+        <div class="row">
+            <div class="col-6 col-md-3 mt-2">
+                <p><strong>ISBN #</strong></p>
+                <p>{{ isbn }}</p>
+            </div>
+            <div class="col-6 col-md-3 mt-2">
+                <p><strong>Title</strong></p>
+                <p>{{ details["title"] }}</p>
+            </div>
+            <div class="col-6 col-md-3 mt-2">
+                <p><strong>Author</strong></p>
+                <p>{{ details["author"] }}</p>
+            </div>
+            <div class="col-6 col-md-3 mt-2">
+                <p><strong>Year</strong></p>
+                <p>{{ details["year"] }}</p>
+            </div>
+        </div>
+    </div>
+
 
     <hr>
 
-    <h3>Reviews</h3>
-
-    
+    <h2 class="mb-4">Reviews</h2>
+    {% if reviews %}
+        <div class="container review-table text-left">
+            {% for rev in reviews %}
+            <div class="row review-row mt-4">
+                <div class="col-3 text-center">
+                    <p>Rating: <br><span class="rating">{{ rev['stars'] }}</span></p>
+                </div>
+                <div class="col-9">
+                    <p class="review-headline">Review by <strong>{{ rev['username'] }}</strong>:</p>
+                    <p>{{ rev['text'] }}</p>
+                </div>
+            </div>    
+            {% endfor %}
+            </table>
+        </div>
+    {% else %}
+        <p class="mt-4">There are currently <strong>no reviews</strong> for this book.</p>
+    {% endif %}
+    <h5 class="mt-4">Rating on <strong><a href="http://goodreads.com" target="_blank">Goodreads.com</a></strong></h5>
+    <p class="mb-4">On <a href="http://goodreads.com" target="_blank">Goodreads</a>, this book received an average rating of <strong>{{ grRev.average_rating }}</strong> in <strong>{{ grRev.ratings_count }} ratings</strong>.</p>
+    <hr>
+    {% if hasreviewed == false %}
+    <h4>Submit your <strong>own review!</strong></h4>
+    <form action="/submitreview" method="POST" class="w-75 mx-auto text-left">
+        <input id="isbn" name="isbn" type="hidden" value="{{ isbn }}">
+        <div class="form-group mt-3">
+            <label for="stars">Your <strong>rating</strong> from 1 to 5</label>
+            <select class="form-control" id="stars" name="stars" required>
+                <option></option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="reviewText">Your <strong>review text</strong></label>
+            <textarea class="form-control" id="reviewText" name="reviewText" rows="3" required></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Submit review</button>
+    </form>
+    <hr>
+    {% else %}
+    <p>You already wrote a review for this book. Thanks a lot!</p>
+    {% endif %}
 </div>
 {% endblock %}
