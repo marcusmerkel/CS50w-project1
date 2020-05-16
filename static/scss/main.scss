@@ -12,10 +12,26 @@ h1 {
   .login-register-con {
     max-width: 75vw;
   }
+  
+  .searchRes-table {
+    max-width: 90vw;
+  }
+
+  .bookDet-table {
+    max-width: 80vw;
+  }
 }
 @media (min-width: 600px) {
   .login-register-con {
     max-width: 50vw;
+  }
+
+  .searchRes-table {
+    max-width: 70vw;
+  }
+
+  .bookDet-table {
+    max-width: 60vw;
   }
 }
 

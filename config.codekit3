@@ -123,6 +123,17 @@
 		"oF": 0,
 		"oS": 3
 		},
+	"/static/images/portobello-books.jpg": {
+		"ft": 16384,
+		"iS": 322732,
+		"jF": 0,
+		"oA": 0,
+		"oAP": "/static/images/portobello-books.jpg",
+		"oF": 0,
+		"oIPL": 0,
+		"opt": 0,
+		"q": 100
+		},
 	"/static/scss/main.scss": {
 		"aP": 0,
 		"bl": 0,
@@ -135,6 +146,14 @@
 		"oF": 2,
 		"oS": 2,
 		"sct": 0
+		},
+	"/templates/book.html": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/templates/book.html",
+		"oF": 0
 		},
 	"/templates/error.html": {
 		"cB": 0,
@@ -174,6 +193,14 @@
 		"hM": 0,
 		"oA": 0,
 		"oAP": "/templates/register.html",
+		"oF": 0
+		},
+	"/templates/search.html": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/templates/search.html",
 		"oF": 0
 		},
 	"/venv": {

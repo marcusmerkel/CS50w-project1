@@ -6,16 +6,25 @@
 
 
 {% block body %}
-    <h1>Books</h1>
-    <h3>Hi, {{ user.username }}!</h3>
+<div class="container text-center">
+    <h1 class="display-4">Books - Project 1</h1>
+    <h3>Welcome back, {{ user }}!</h3>
+    <br><br>
+    <h3><strong>Search</strong> for a book</h3>
 
-    <p>{{ content }}</p>
+    <form class="form-inline d-block mt-2" action="/" method="POST">
+        <label class="sr-only" for="q">Name</label>
+        <input type="text" size="50" class="form-control mb-2 mr-sm-2" name="q" id="searchText" placeholder="ISBN, Title or Author" required>
+        <button type="submit" class="btn btn-primary mb-2">Find this</button>
+    </form>
 
-    <ul>
+    <img class="my-3" width="80%" src="{{ url_for('static', filename='images/portobello-books.jpg') }}" alt="pile of books">
+
+    <!--<ul>
         <li>{{ res.books[0].id }}</li>
         <li>{{ res.books[0].isbn }}</li>
         <li>{{ res.books[0] }}</li>
 
-    </ul>
-
+    </ul>-->
+</div>
 {% endblock %}

@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search Results
+{% endblock %}
+
+
+{% block body %}
+<div class="container text-center">
+    <h1 class="display-4">Books - Project 1</h1>
+    <br>
+    <h3 class="mb-4"><strong>Search results</strong> for <em>{{ q }}</em></h3>
+
+    <table class="table searchRes-table table-hover mx-auto">
+        <thead>
+            <tr>
+                <th scope="col">ISBN #</th>
+                <th scope="col">Title</th>
+                <th scope="col">Author</th>
+                <th scope="col">Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in res %}
+            <tr>
+                <th scope="row"><a href="{{ url_for('sbook', isbn=r['isbn'], q=q) }}">{{ r['isbn'] }}</a></td>
+                <td>{{ r['title'] }}</td>
+                <td>{{ r['author'] }}</td>
+                <td>{{ r['year'] }}</td>
+                <td><a href="{{ url_for('sbook', isbn=r['isbn'], q=q) }}">Reviews & more</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <a href="{{ url_for('index') }}">Back to home</a>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Book Details for ISBN {{ isbn }}
+{% endblock %}
+
+
+{% block body %}
+<div class="container text-center">
+    <h1 class="display-4">Books - Project 1</h1>
+    <br>
+    {% if q %}
+    <a href="/search/{{ q }}">Back to search results</a>
+    <br><br>
+    {% endif %}
+    <h3 class="mb-4"><strong>Book details</strong></h3>
+
+    <table class="table bookDet-table mx-auto">
+        <thead>
+            <tr>
+                <th>ISBN</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ isbn }}</td>
+                <td>{{ details["title"] }}</td>
+                <td>{{ details["author"] }}</td>
+                <td>{{ details["year"] }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h3>Reviews</h3>
+
+    
+</div>
+{% endblock %}

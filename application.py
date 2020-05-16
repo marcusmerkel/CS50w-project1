@@ -53,14 +53,46 @@ def login_required(f):
     return decorated_function
 
 
-@app.route("/")
-@app.route("/index")
+@app.route("/", methods=["GET", "POST"])
+@app.route("/index", methods=["GET", "POST"])
 @login_required
 def index():
-    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": KEY, "isbns": "9781632168146"}).json()
-    user = {"username": "Marcus"}
-    content = "Project 1: TODO"
-    return render_template("index.html", user=user, content=content, res=res) 
+    if request.method == "POST":
+        q = request.form.get("q")
+        return search(q)
+    else:
+        res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": KEY, "isbns": "9781632168146"}).json()
+        # user = {"username": "Marcus"}
+        user = db.execute("SELECT * FROM users WHERE id=:id", {"id": session.get("user_id")}).fetchone()["username"]
+        id = session.get("user_id")
+        content = "Project 1: TODO"
+        return render_template("index.html", user=user, content=content, res=res) 
+
+
+@app.route("/search/<string:q>")
+@login_required
+def search(q):
+    res = db.execute("SELECT * FROM books WHERE LOWER(isbn) LIKE :q OR LOWER(title) LIKE :q OR LOWER(author) LIKE :q", {"q": "%" + q.lower() + "%"}).fetchall()
+    if len(res) == 0:
+        return error(f"No results for {q}", 400)
+    else:
+        return render_template("search.html", q=q, res=res)
+
+
+@app.route("/book/<string:isbn>/<string:q>")
+@login_required
+def sbook(isbn, q):
+    details = db.execute("SELECT title, author, year FROM books WHERE LOWER(isbn) = :isbn", {"isbn": isbn.lower()}).fetchone()
+    return render_template("book.html", isbn=isbn, details=details, q=q)
+
+@app.route("/book/<string:isbn>")
+@login_required
+def book(isbn):
+    details = db.execute("SELECT title, author, year FROM books WHERE LOWER(isbn) = :isbn", {"isbn": isbn.lower()}).fetchone()
+    if len(details) == 0:
+        return error(f"No results for {q}", 400)
+    else:
+        return render_template("book.html", isbn=isbn, details=details)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -81,7 +113,7 @@ def login():
 
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = :username",
-                          {"username" :request.form.get("username")}).fetchall()
+                          {"username": request.form.get("username")}).fetchall()
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["password_hash"], request.form.get("password")):
