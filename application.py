@@ -1,7 +1,7 @@
 import os
 import requests
 
-from flask import Flask, session, render_template, flash, redirect, url_for, request, session
+from flask import Flask, session, render_template, flash, redirect, url_for, request, session, jsonify
 from flask_session import Session
 from functools import wraps
 from sqlalchemy import create_engine
@@ -98,13 +98,46 @@ def book(isbn, q=None):
 
 @app.route("/submitreview", methods=["POST"])
 def submitReview():
+    # get details from form
     isbn = request.form.get("isbn")
     user_id = session.get("user_id")
     stars = request.form.get("stars")
     text = request.form.get("reviewText")
-    db.execute("INSERT INTO reviews (isbn, user_id, stars, text) VALUES (:isbn, :user_id, :stars, :text)", {"isbn": isbn, "user_id": user_id, "stars": stars, "text": text})
+
+    # insert into database
+    db.execute("INSERT INTO reviews (isbn, user_id, stars, text) VALUES (:isbn, :user_id, :stars, :text)", 
+                {"isbn": isbn, "user_id": user_id, "stars": stars, "text": text})
     db.commit()
+    
+    flash("Review successfully submitted!")
+
+    # redirect back to book detail page
     return redirect("/book/" + isbn)
+
+
+@app.route("/api/book/<string:isbn>")
+def book_api(isbn):
+    book = db.execute("SELECT * FROM books WHERE isbn=:isbn", {"isbn": isbn}).fetchone()
+    
+    # check if book exists
+    if book is None:
+        return jsonify({"error": "No book with this ISBN"}), 404
+    
+    # assigning variables 
+    title = book["title"]
+    author = book["author"]
+    year = book["year"]
+    review_count = db.execute("SELECT * FROM reviews WHERE isbn=:isbn", {"isbn": isbn}).rowcount
+    average_score = float(round(db.execute("SELECT AVG(stars) FROM reviews WHERE isbn=:isbn", {"isbn": isbn}).fetchone()[0], 2))
+    
+    return jsonify({
+        "title": title,
+        "author": author,
+        "year": year,
+        "isbn": isbn,
+        "review_count": review_count,
+        "average_score": average_score
+    })
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -144,15 +177,6 @@ def register():
     # POST method
     if request.method == "POST":
 
-        if not request.form.get("username"):
-            return error("must provide username", 403)
-
-        elif not request.form.get("password"):
-            return error("must provide password", 403)
-
-        elif not request.form.get("password-2"):
-            return error("must confirm password", 403)
-
         username = request.form.get("username")
         pw = request.form.get("password")
         pw2 = request.form.get("password-2")
@@ -161,9 +185,14 @@ def register():
         if pw != pw2:
             return error("password does not equal confirm password", 403)
 
+        if db.execute("SELECT * FROM users WHERE username=:username", 
+                        {"username": username}).rowcount > 0:
+            return error("username already in use", 403)
+
         hashed = generate_password_hash(pw)
 
-        db.execute("INSERT INTO users (username, password_hash) VALUES (:username, :hashed);", {"username": username, "hashed": hashed})
+        db.execute("INSERT INTO users (username, password_hash) VALUES (:username, :hashed);", 
+                    {"username": username, "hashed": hashed})
         db.commit()
         flash("Register succesful!")
 

@@ -59,11 +59,13 @@
     {% else %}
         <p class="mt-4">There are currently <strong>no reviews</strong> for this book.</p>
     {% endif %}
-    <h5 class="mt-4">Rating on <strong><a href="http://goodreads.com" target="_blank">Goodreads.com</a></strong></h5>
-    <p class="mb-4">On <a href="http://goodreads.com" target="_blank">Goodreads</a>, this book received an average rating of <strong>{{ grRev.average_rating }}</strong> in <strong>{{ grRev.ratings_count }} ratings</strong>.</p>
+    <div class="alert alert-secondary mt-3">
+        <h5 class="mt-4">Rating on <strong><a href="http://goodreads.com" target="_blank">Goodreads.com</a></strong></h5>
+        <p class="mb-4">On <a href="http://goodreads.com" target="_blank">Goodreads</a>, this book received an average rating of <strong>{{ grRev.average_rating }}</strong> in <strong>{{ grRev.ratings_count }} ratings</strong>.</p>
+    </div>
     <hr>
     {% if hasreviewed == false %}
-    <h4>Submit your <strong>own review!</strong></h4>
+    <h4>Leave a <strong>review!</strong></h4>
     <form action="/submitreview" method="POST" class="w-75 mx-auto text-left">
         <input id="isbn" name="isbn" type="hidden" value="{{ isbn }}">
         <div class="form-group mt-3">
@@ -85,7 +87,9 @@
     </form>
     <hr>
     {% else %}
-    <p>You already wrote a review for this book. Thanks a lot!</p>
+    <div class="alert alert-success">
+        <p class="mb-0">You already left a review for this book. Thanks a lot!</p>
+    </div>
     {% endif %}
 </div>
 {% endblock %}
