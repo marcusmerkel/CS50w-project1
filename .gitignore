@@ -4,3 +4,5 @@ lib
 venv
 flask_session
 __pycache__
+_assets
+config.codekit3

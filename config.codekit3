@@ -37,6 +37,14 @@
 		"oAP": "/build/__pycache__",
 		"oF": 0
 		},
+	"/_assets/project_1-books.mov": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/_assets/project_1-books.mov",
+		"oF": 0
+		},
 	"/application.py": {
 		"cB": 0,
 		"ft": 8192,
@@ -85,6 +93,14 @@
 		"oF": 0,
 		"oS": 0,
 		"sct": 0
+		},
+	"/README.html": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/README.html",
+		"oF": 0
 		},
 	"/README.md": {
 		"cB": 0,
